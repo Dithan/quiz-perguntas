@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:projeto_perguntas/questao.dart';
+import 'package:projeto_perguntas/resposta.dart';
 
 main() {
   runApp(PerguntaApp());
@@ -8,46 +9,59 @@ main() {
 class PerguntaAppState extends State<PerguntaApp> {
   var perguntaSelecionada = 0;
 
+  final _perguntas = [
+    {
+      'texto': "1 - Qual é a sua cor favorita?",
+      'respostas': ['Azul', 'Vermelho', 'Preto', 'Rosa'],
+    },
+    {
+      'texto': "2 - Qual é o seu animal favorito?",
+      'respostas': ['Gato', 'Cachorro', 'Vaca', 'Dinossauro'],
+    },
+    {
+      'texto': '3 - Qual sua comida favorita?',
+      'respostas': ['Pizza', 'Hamburguer', 'Feijoada', 'Churrasco'],
+    }
+  ];
+
+  // Ativa quando o botão resposta é clicado
   void responder() {
-    print("Pergunta respondida");
     setState(() {
-      perguntaSelecionada += 1;
-      if (perguntaSelecionada > 1) {
-        perguntaSelecionada = 0;
-      }
+      perguntaSelecionada++;
     });
+  }
+
+  bool get temPerguntaSelecionada {
+    return perguntaSelecionada < _perguntas.length;
   }
 
   @override
   Widget build(BuildContext context) {
-    final List<String> perguntas = [
-      "Qual é a sua cor favorita?",
-      "Qual é o seu animal favorito?",
-    ];
+    List<String> respostas = temPerguntaSelecionada
+        ? (_perguntas[perguntaSelecionada]['respostas'] as List<String>)
+        : [];
 
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
           title: Text("Perguntas"),
         ),
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Questao(perguntas[perguntaSelecionada]),
-            ElevatedButton(
-              onPressed: responder,
-              child: Text('Resposta 1'),
-            ),
-            ElevatedButton(
-              onPressed: responder,
-              child: Text('Resposta 2'),
-            ),
-            ElevatedButton(
-              onPressed: responder,
-              child: Text('Resposta 3'),
-            )
-          ],
-        ),
+        body: temPerguntaSelecionada
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Widget Questão
+                  Questao(_perguntas[perguntaSelecionada]['texto'].toString()),
+                  // Widget Botão Resposta
+                  ...respostas.map((texto) => Resposta(texto, responder))
+                ],
+              )
+            : Center(
+                child: Text(
+                  "Parabéns!",
+                  style: TextStyle(fontSize: 28),
+                ),
+              ),
       ),
     );
   }
